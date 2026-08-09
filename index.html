@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Placement Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3EFE3;
+    --paper-raised:#FBF9F2;
+    --ink:#1E2A38;
+    --ink-soft:#4C5A6E;
+    --ink-faint:#8C93A0;
+    --gold:#B8863B;
+    --gold-soft:#E8D9B8;
+    --green:#3F7D58;
+    --green-soft:#DCEBE1;
+    --rust:#A8432E;
+    --rust-soft:#F1DDD4;
+    --line:#DCD3BE;
+    --shadow: 0 1px 2px rgba(30,42,56,0.06), 0 6px 20px rgba(30,42,56,0.06);
+    --radius: 10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.serif{font-family:'Fraunces',serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  button{font-family:inherit;cursor:pointer;}
+  input,select,textarea{font-family:inherit;}
+  #app{min-height:100vh;display:flex;flex-direction:column;}
+
+  /* ---------- Landing ---------- */
+  .landing{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px 20px;text-align:center;
+  }
+  .landing-eyebrow{
+    letter-spacing:0.14em;text-transform:uppercase;font-size:11px;color:var(--gold);
+    font-weight:600;margin-bottom:14px;
+  }
+  .landing h1{font-size:clamp(32px,6vw,52px);font-weight:600;margin:0 0 10px;line-height:1.05;}
+  .landing p{color:var(--ink-soft);max-width:440px;margin:0 auto 40px;font-size:15px;line-height:1.6;}
+  .module-cards{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;max-width:680px;}
+  .module-card{
+    background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius);
+    padding:28px 26px;width:280px;text-align:left;box-shadow:var(--shadow);
+    transition:transform .15s ease, box-shadow .15s ease;position:relative;overflow:hidden;
+  }
+  .module-card:hover{transform:translateY(-3px);box-shadow:0 4px 8px rgba(30,42,56,0.08), 0 14px 28px rgba(30,42,56,0.1);}
+  .module-card .stamp{
+    position:absolute;top:18px;right:-30px;background:var(--gold);color:var(--paper-raised);
+    font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.08em;
+    padding:3px 34px;transform:rotate(38deg);
+  }
+  .module-card h3{font-size:22px;margin:6px 0 8px;font-weight:600;}
+  .module-card p{color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin:0 0 18px;}
+  .module-card .go-btn{
+    background:var(--ink);color:var(--paper-raised);border:none;padding:10px 18px;border-radius:7px;
+    font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;
+  }
+  .module-card .go-btn:hover{background:var(--gold);}
+
+  /* ---------- Auth screen ---------- */
+  .auth-screen{
+    flex:1;display:flex;align-items:center;justify-content:center;padding:20px;
+  }
+  .auth-box{
+    background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius);
+    padding:36px 32px;width:100%;max-width:340px;box-shadow:var(--shadow);text-align:center;
+  }
+  .auth-box .badge{
+    width:46px;height:46px;border-radius:50%;background:var(--ink);color:var(--paper-raised);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-family:'Fraunces',serif;
+    font-size:19px;font-weight:600;
+  }
+  .auth-box h2{font-size:20px;margin:0 0 6px;}
+  .auth-box .sub{color:var(--ink-soft);font-size:13px;margin:0 0 22px;}
+  .pin-input{
+    width:100%;padding:12px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;
+    font-size:16px;letter-spacing:0.3em;text-align:center;margin-bottom:12px;font-family:'JetBrains Mono',monospace;
+  }
+  .pin-input:focus{outline:none;border-color:var(--gold);}
+  .primary-btn{
+    width:100%;background:var(--ink);color:var(--paper-raised);border:none;padding:12px;border-radius:8px;
+    font-weight:600;font-size:14px;
+  }
+  .primary-btn:hover{background:var(--gold);}
+  .auth-error{color:var(--rust);font-size:12.5px;margin:-4px 0 12px;min-height:14px;}
+  .back-link{display:block;margin-top:16px;color:var(--ink-faint);font-size:12.5px;text-decoration:none;}
+  .back-link:hover{color:var(--ink-soft);}
+
+  /* ---------- App shell ---------- */
+  .shell{flex:1;display:flex;min-height:100vh;}
+  .sidebar{
+    width:220px;background:var(--ink);color:var(--paper);flex-shrink:0;display:flex;flex-direction:column;
+    padding:22px 14px;
+  }
+  .sidebar .brand{font-family:'Fraunces',serif;font-size:17px;font-weight:600;padding:0 10px 20px;
+    border-bottom:1px solid rgba(255,255,255,0.12);margin-bottom:16px;color:#fff;}
+  .sidebar .brand small{display:block;font-family:'Inter',sans-serif;font-size:10.5px;color:var(--gold-soft);
+    text-transform:uppercase;letter-spacing:0.1em;margin-top:3px;font-weight:600;}
+  .nav-item{
+    display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:7px;
+    color:rgba(255,255,255,0.72);font-size:13.5px;font-weight:500;margin-bottom:3px;background:none;border:none;
+    width:100%;text-align:left;
+  }
+  .nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .nav-item.active{background:rgba(255,255,255,0.1);color:#fff;}
+  .nav-item .count{
+    background:rgba(255,255,255,0.14);padding:1px 7px;border-radius:20px;font-size:11px;font-family:'JetBrains Mono',monospace;
+  }
+  .nav-item.active .count{background:var(--gold);color:var(--ink);}
+  .sidebar-foot{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,0.12);}
+  .sidebar-foot button{
+    background:none;border:none;color:rgba(255,255,255,0.55);font-size:12.5px;padding:8px 12px;width:100%;text-align:left;
+    border-radius:6px;
+  }
+  .sidebar-foot button:hover{background:rgba(255,255,255,0.06);color:#fff;}
+
+  .main{flex:1;padding:30px 36px;overflow-x:hidden;max-width:1100px;}
+  .main-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;}
+  .main-header h1{font-size:26px;margin:0 0 4px;font-weight:600;}
+  .main-header .sub{color:var(--ink-soft);font-size:13.5px;}
+  .add-btn{
+    background:var(--ink);color:#fff;border:none;padding:10px 16px;border-radius:8px;font-size:13.5px;font-weight:600;
+    display:flex;align-items:center;gap:6px;white-space:nowrap;
+  }
+  .add-btn:hover{background:var(--gold);}
+
+  /* ---------- Stat cards ---------- */
+  .stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-bottom:28px;}
+  .stat-card{
+    background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;
+  }
+  .stat-card .num{font-family:'Fraunces',serif;font-size:30px;font-weight:600;line-height:1;}
+  .stat-card .label{font-size:11.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:0.06em;margin-top:6px;font-weight:600;}
+  .stat-card.gold .num{color:var(--gold);}
+  .stat-card.green .num{color:var(--green);}
+  .stat-card.rust .num{color:var(--rust);}
+
+  /* ---------- Section titles ---------- */
+  .section-title{font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-soft);
+    font-weight:700;margin:0 0 12px;}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+  .search-box{
+    flex:1;min-width:180px;padding:9px 13px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:13.5px;
+  }
+  .search-box:focus{outline:none;border-color:var(--gold);}
+
+  /* ---------- Cards / list ---------- */
+  .card-list{display:flex;flex-direction:column;gap:10px;}
+  .item-card{
+    background:var(--paper-raised);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;
+    display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;
+  }
+  .item-card .left{flex:1;min-width:220px;}
+  .item-name{font-family:'Fraunces',serif;font-size:17px;font-weight:600;margin:0 0 4px;}
+  .item-meta{color:var(--ink-soft);font-size:12.5px;line-height:1.7;}
+  .item-meta span{display:inline-flex;align-items:center;gap:4px;margin-right:14px;}
+  .item-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .pill-btn{
+    border:1px solid var(--line);background:#fff;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;color:var(--ink-soft);
+  }
+  .pill-btn:hover{border-color:var(--ink);color:var(--ink);}
+  .pill-btn.positive:hover{border-color:var(--green);color:var(--green);}
+  .pill-btn.negative:hover{border-color:var(--rust);color:var(--rust);}
+  .icon-btn{
+    border:none;background:none;color:var(--ink-faint);padding:6px;border-radius:6px;font-size:14px;
+  }
+  .icon-btn:hover{background:var(--line);color:var(--ink);}
+
+  .stamp-tag{
+    font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:0.06em;
+    padding:3px 9px;border-radius:4px;text-transform:uppercase;display:inline-block;border:1.5px dashed;
+  }
+  .stamp-tag.positive{color:var(--green);border-color:var(--green);background:var(--green-soft);}
+  .stamp-tag.negative{color:var(--rust);border-color:var(--rust);background:var(--rust-soft);}
+  .stamp-tag.pending{color:var(--gold);border-color:var(--gold);background:var(--gold-soft);}
+  .stamp-tag.overdue{color:#fff;border-color:var(--rust);background:var(--rust);}
+
+  .empty-state{
+    text-align:center;padding:60px 20px;color:var(--ink-faint);
+  }
+  .empty-state .glyph{font-size:34px;margin-bottom:10px;}
+  .empty-state p{font-size:13.5px;max-width:280px;margin:0 auto;}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(30,42,56,0.45);display:flex;align-items:center;justify-content:center;
+    padding:20px;z-index:100;
+  }
+  .modal{
+    background:var(--paper-raised);border-radius:14px;width:100%;max-width:480px;max-height:88vh;overflow-y:auto;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  }
+  .modal-head{padding:20px 24px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+  .modal-head h3{margin:0;font-size:18px;}
+  .modal-close{border:none;background:none;font-size:18px;color:var(--ink-faint);padding:4px 8px;border-radius:6px;}
+  .modal-close:hover{background:var(--line);}
+  .modal-body{padding:20px 24px;}
+  .form-row{margin-bottom:14px;}
+  .form-row label{display:block;font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;}
+  .form-row input,.form-row select,.form-row textarea{
+    width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);font-size:13.5px;background:#fff;color:var(--ink);
+  }
+  .form-row input:focus,.form-row select:focus,.form-row textarea:focus{outline:none;border-color:var(--gold);}
+  .form-row textarea{resize:vertical;min-height:60px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px;}
+  .modal-foot{padding:16px 24px 22px;display:flex;gap:10px;justify-content:flex-end;}
+  .btn-ghost{background:none;border:1px solid var(--line);padding:10px 16px;border-radius:8px;font-size:13.5px;font-weight:600;color:var(--ink-soft);}
+  .btn-ghost:hover{border-color:var(--ink);color:var(--ink);}
+  .btn-solid{background:var(--ink);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-size:13.5px;font-weight:600;}
+  .btn-solid:hover{background:var(--gold);}
+  .btn-solid.rust{background:var(--rust);}
+  .btn-solid.green{background:var(--green);}
+
+  .history-item{border-left:2px solid var(--line);padding:6px 0 6px 12px;margin-bottom:4px;font-size:12.5px;color:var(--ink-soft);}
+  .history-item .hdate{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink-faint);}
+
+  .date-chip{
+    display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid var(--line);
+    border-radius:8px;padding:9px 12px;margin-bottom:8px;font-size:13px;
+  }
+  .date-chip .dc-name{font-weight:600;}
+  .date-chip .dc-when{color:var(--ink-soft);font-family:'JetBrains Mono',monospace;font-size:11.5px;}
+  .add-date-row{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+  .add-date-row input{flex:1;min-width:100px;}
+
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;
+    padding:11px 20px;border-radius:8px;font-size:13px;font-weight:500;box-shadow:var(--shadow);z-index:200;
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-4px);}
+
+  @media (max-width: 760px){
+    .shell{flex-direction:column;}
+    .sidebar{width:100%;flex-direction:row;overflow-x:auto;padding:12px;align-items:center;}
+    .sidebar .brand{display:none;}
+    .nav-item{white-space:nowrap;margin-bottom:0;margin-right:4px;}
+    .sidebar-foot{margin-top:0;border-top:none;padding-top:0;}
+    .sidebar-foot button{white-space:nowrap;}
+    .main{padding:20px 16px;}
+    .form-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* =========================================================
+   SUPABASE SETUP
+========================================================= */
+const SUPABASE_URL = 'https://svwdegcqkngeqkjpzwpk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_hiE4_JWjB64IlrUDV9xv2A_akCRZ1hW';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/* ---- mapping helpers: JS camelCase <-> DB snake_case ---- */
+function companyToRow(c){
+  return {
+    id: c.id, name: c.name || null, hr_name: c.hrName || null, contact: c.contact || null,
+    email: c.email || null, status: c.status || 'daily',
+    next_contact_date: c.nextContactDate || null, follow_up_date: c.followUpDate || null,
+    negative_reason: c.negativeReason || null, reattempt_date: c.reattemptDate || null,
+    history: c.history || [], created_at: c.createdAt || todayISO()
+  };
+}
+function rowToCompany(r){
+  return {
+    id: r.id, name: r.name, hrName: r.hr_name, contact: r.contact, email: r.email,
+    status: r.status, nextContactDate: r.next_contact_date, followUpDate: r.follow_up_date,
+    negativeReason: r.negative_reason, reattemptDate: r.reattempt_date,
+    history: r.history || [], createdAt: r.created_at
+  };
+}
+function applicationToRow(a){
+  return {
+    id: a.id, company_name: a.companyName || null, site_link: a.siteLink || null,
+    contact: a.contact || null, email: a.email || null, jd_summary: a.jdSummary || null,
+    last_reg_date: a.lastRegDate || null, registered_date: a.registeredDate || null,
+    status: a.status || 'applied', important_dates: a.importantDates || [],
+    created_at: a.createdAt || todayISO()
+  };
+}
+function rowToApplication(r){
+  return {
+    id: r.id, companyName: r.company_name, siteLink: r.site_link, contact: r.contact,
+    email: r.email, jdSummary: r.jd_summary, lastRegDate: r.last_reg_date,
+    registeredDate: r.registered_date, status: r.status,
+    importantDates: r.important_dates || [], createdAt: r.created_at
+  };
+}
+
+/* ---- remote data calls ---- */
+async function fetchCompanies(){
+  const {data, error} = await sb.from('companies').select('*').order('created_at', {ascending:true});
+  if(error){ console.error(error); toast('Could not load companies — check connection'); return []; }
+  return data.map(rowToCompany);
+}
+async function fetchApplications(){
+  const {data, error} = await sb.from('applications').select('*').order('created_at', {ascending:true});
+  if(error){ console.error(error); toast('Could not load applications — check connection'); return []; }
+  return data.map(rowToApplication);
+}
+async function saveCompanyRemote(company){
+  const {error} = await sb.from('companies').upsert(companyToRow(company));
+  if(error){ console.error(error); toast('Save failed — check connection'); return false; }
+  return true;
+}
+async function deleteCompanyRemote(id){
+  const {error} = await sb.from('companies').delete().eq('id', id);
+  if(error){ console.error(error); toast('Delete failed'); return false; }
+  return true;
+}
+async function saveApplicationRemote(app){
+  const {error} = await sb.from('applications').upsert(applicationToRow(app));
+  if(error){ console.error(error); toast('Save failed — check connection'); return false; }
+  return true;
+}
+async function deleteApplicationRemote(id){
+  const {error} = await sb.from('applications').delete().eq('id', id);
+  if(error){ console.error(error); toast('Delete failed'); return false; }
+  return true;
+}
+async function getDeskPin(desk){
+  const {data, error} = await sb.from('desk_pins').select('pin').eq('desk', desk).maybeSingle();
+  if(error){ console.error(error); toast('Could not reach database — check connection'); return undefined; }
+  return data ? data.pin : null;
+}
+async function setDeskPin(desk, pin){
+  const {error} = await sb.from('desk_pins').insert({desk, pin});
+  if(error){ console.error(error); toast('Could not set PIN — check connection'); return false; }
+  return true;
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function fmtDate(iso){
+  if(!iso) return '—';
+  const d = new Date(iso+'T00:00:00');
+  if(isNaN(d)) return iso;
+  return d.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+}
+function todayISO(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function isOverdue(iso){ return iso && iso < todayISO(); }
+function isToday(iso){ return iso === todayISO(); }
+
+function firstMondayISO(year, monthIndex){
+  const d = new Date(year, monthIndex, 1);
+  const day = d.getDay();
+  const diff = (8 - day) % 7;
+  d.setDate(1 + diff);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function nextMonthDefault(){
+  const d = new Date();
+  let m = d.getMonth()+1, y = d.getFullYear();
+  if(m>11){m=0;y++;}
+  return firstMondayISO(y,m);
+}
+
+/* =========================================================
+   APP STATE
+========================================================= */
+const state = {
+  screen: 'landing',      // landing | auth | tnp | personal
+  module: null,           // 'tnp' | 'personal'
+  tnpView: 'dashboard',   // dashboard | daily | positive | negative | all
+  personalView: 'dashboard', // dashboard | applications | upcoming
+  companies: [],
+  applications: [],
+  search: '',
+  modal: null,            // {type, data}
+  authError: ''
+};
+
+/* =========================================================
+   RENDER ROOT
+========================================================= */
+function render(){
+  const app = document.getElementById('app');
+  if(state.screen === 'landing') app.innerHTML = renderLanding();
+  else if(state.screen === 'auth') app.innerHTML = renderAuth();
+  else if(state.screen === 'tnp') app.innerHTML = renderShell('tnp');
+  else if(state.screen === 'personal') app.innerHTML = renderShell('personal');
+  if(state.modal) renderModal();
+  attachHandlers();
+}
+
+/* =========================================================
+   LANDING
+========================================================= */
+function renderLanding(){
+  return `
+  <div class="landing">
+    <div class="landing-eyebrow">Campus Placement Cell</div>
+    <h1>Placement Desk</h1>
+    <p>Two ledgers, one desk. Track outreach to companies as T&amp;P, and keep your own applications straight — separately, and privately.</p>
+    <div class="module-cards">
+      <div class="module-card" data-open-module="tnp">
+        <div class="stamp">OFFICIAL</div>
+        <h3>T&amp;P Tracker</h3>
+        <p>Log companies, follow up on schedule, and move them through Daily → Positive / Negative as HRs respond.</p>
+        <button class="go-btn" data-open-module="tnp">Enter desk →</button>
+      </div>
+      <div class="module-card" data-open-module="personal">
+        <div class="stamp">PRIVATE</div>
+        <h3>Personal Applications</h3>
+        <p>Your own job hunt — deadlines, test dates, interview rounds, all in one place.</p>
+        <button class="go-btn" data-open-module="personal">Enter desk →</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   AUTH
+========================================================= */
+async function goToAuth(module){
+  state.module = module;
+  state.screen = 'auth';
+  state.authError = '';
+  render();
+}
+
+function renderAuth(){
+  const label = state.module === 'tnp' ? 'T&P Desk' : 'Personal Desk';
+  const initial = state.module === 'tnp' ? 'T&P' : 'PA';
+  return `
+  <div class="auth-screen">
+    <div class="auth-box">
+      <div class="badge">${initial}</div>
+      <h2 id="auth-title">Loading…</h2>
+      <p class="sub" id="auth-sub"></p>
+      <input type="password" inputmode="numeric" maxlength="6" class="pin-input" id="pin-field" placeholder="••••">
+      <div class="auth-error">${state.authError || ''}</div>
+      <button class="primary-btn" id="pin-submit">Continue</button>
+      <a href="#" class="back-link" id="back-to-landing">← back</a>
+    </div>
+  </div>`;
+}
+
+async function initAuthScreen(){
+  const title = document.getElementById('auth-title');
+  const sub = document.getElementById('auth-sub');
+  if(!title) return;
+  title.textContent = 'Checking…';
+  sub.textContent = '';
+  const existing = await getDeskPin(state.module);
+  if(existing === undefined) return; // connection error already toasted
+  if(existing){
+    title.textContent = 'Enter PIN';
+    sub.textContent = 'This desk is locked. Enter your PIN to continue.';
+  } else {
+    title.textContent = 'Set a PIN';
+    sub.textContent = 'First time here — choose a 4–6 digit PIN to lock this desk.';
+  }
+}
+
+async function handlePinSubmit(){
+  const field = document.getElementById('pin-field');
+  const val = field.value.trim();
+  if(val.length < 4){
+    state.authError = 'PIN should be at least 4 digits.';
+    render(); document.getElementById('pin-field').focus();
+    return;
+  }
+  const submitBtn = document.getElementById('pin-submit');
+  if(submitBtn){ submitBtn.textContent = 'Checking…'; submitBtn.disabled = true; }
+  const existing = await getDeskPin(state.module);
+  if(existing){
+    if(existing === val){
+      await enterModule(state.module);
+    } else {
+      state.authError = 'Incorrect PIN. Try again.';
+      render();
+    }
+  } else if(existing === null){
+    const ok = await setDeskPin(state.module, val);
+    if(ok){
+      toast('PIN set. Keep it safe.');
+      await enterModule(state.module);
+    } else {
+      state.authError = 'Could not save PIN. Check your connection and try again.';
+      render();
+    }
+  } else {
+    state.authError = 'Could not reach the database. Check your connection and try again.';
+    render();
+  }
+}
+
+async function enterModule(module){
+  state.authError = '';
+  if(module === 'tnp'){
+    state.screen = 'tnp'; state.tnpView = 'dashboard';
+    state.companies = [];
+    render();
+    state.companies = await fetchCompanies();
+  } else {
+    state.screen = 'personal'; state.personalView = 'dashboard';
+    state.applications = [];
+    render();
+    state.applications = await fetchApplications();
+  }
+  state.search = '';
+  render();
+}
+
+/* =========================================================
+   SHELL (sidebar + main)
+========================================================= */
+function renderShell(module){
+  const nav = module === 'tnp' ? tnpNavItems() : personalNavItems();
+  return `
+  <div class="shell">
+    <div class="sidebar">
+      <div class="brand">Placement Desk<small>${module === 'tnp' ? 'T&P Ledger' : 'Personal Tracker'}</small></div>
+      ${nav}
+      <div class="sidebar-foot">
+        <button id="lock-desk">🔒 Lock &amp; switch desk</button>
+      </div>
+    </div>
+    <div class="main">
+      ${module === 'tnp' ? renderTnpMain() : renderPersonalMain()}
+    </div>
+  </div>`;
+}
+
+function navItem(id, label, count, activeView, setter){
+  const active = activeView === id ? 'active' : '';
+  return `<button class="nav-item ${active}" data-nav="${id}">
+    <span>${label}</span>${count!==null?`<span class="count">${count}</span>`:''}
+  </button>`;
+}
+
+function tnpNavItems(){
+  const c = state.companies;
+  const dailyCount = c.filter(x=>x.status==='daily').length;
+  const posCount = c.filter(x=>x.status==='positive').length;
+  const negCount = c.filter(x=>x.status==='negative').length;
+  return [
+    navItem('dashboard','Dashboard',null),
+    navItem('daily','Daily',dailyCount),
+    navItem('positive','Positive',posCount),
+    navItem('negative','Negative',negCount),
+    navItem('all','All Companies',c.length)
+  ].join('');
+}
+function personalNavItems(){
+  const a = state.applications;
+  return [
+    navItem('dashboard','Dashboard',null),
+    navItem('applications','Applications',a.length),
+    navItem('upcoming','Upcoming Dates',null)
+  ].join('');
+}
+
+/* =========================================================
+   T&P MAIN
+========================================================= */
+function renderTnpMain(){
+  const v = state.tnpView;
+  if(v === 'dashboard') return renderTnpDashboard();
+  if(v === 'daily') return renderTnpList('daily');
+  if(v === 'positive') return renderTnpList('positive');
+  if(v === 'negative') return renderTnpList('negative');
+  if(v === 'all') return renderTnpList('all');
+  return '';
+}
+
+function renderTnpDashboard(){
+  const c = state.companies;
+  const daily = c.filter(x=>x.status==='daily');
+  const positive = c.filter(x=>x.status==='positive');
+  const negative = c.filter(x=>x.status==='negative');
+  const dueToday = daily.filter(x=>isToday(x.nextContactDate));
+  const overdue = daily.filter(x=>isOverdue(x.nextContactDate));
+  const followupsToday = positive.filter(x=>isToday(x.followUpDate));
+  const followupsOverdue = positive.filter(x=>isOverdue(x.followUpDate));
+
+  const upcoming = [...daily, ...positive]
+    .map(x=>({name:x.name, date: x.status==='daily'?x.nextContactDate:x.followUpDate, type: x.status==='daily'?'Contact':'Follow-up', id:x.id, status:x.status}))
+    .filter(x=>x.date)
+    .sort((a,b)=> a.date.localeCompare(b.date))
+    .slice(0,6);
+
+  return `
+  <div class="main-header">
+    <div><h1>Dashboard</h1><div class="sub">Overview of your outreach pipeline</div></div>
+    <button class="add-btn" data-modal="add-company">+ Add Company</button>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card"><div class="num">${c.length}</div><div class="label">Total Companies</div></div>
+    <div class="stat-card gold"><div class="num">${daily.length}</div><div class="label">In Daily Queue</div></div>
+    <div class="stat-card green"><div class="num">${positive.length}</div><div class="label">Positive</div></div>
+    <div class="stat-card rust"><div class="num">${negative.length}</div><div class="label">Negative</div></div>
+  </div>
+  ${(overdue.length + followupsOverdue.length) > 0 ? `
+  <div class="section-title">⚠ Overdue (${overdue.length + followupsOverdue.length})</div>
+  <div class="card-list" style="margin-bottom:26px;">
+    ${overdue.map(x=>tnpItemCard(x)).join('')}
+    ${followupsOverdue.map(x=>tnpItemCard(x)).join('')}
+  </div>` : ''}
+  ${(dueToday.length + followupsToday.length) > 0 ? `
+  <div class="section-title">Due Today (${dueToday.length + followupsToday.length})</div>
+  <div class="card-list" style="margin-bottom:26px;">
+    ${dueToday.map(x=>tnpItemCard(x)).join('')}
+    ${followupsToday.map(x=>tnpItemCard(x)).join('')}
+  </div>` : ''}
+  <div class="section-title">Upcoming</div>
+  ${upcoming.length === 0 ? emptyState('📋','Nothing scheduled yet. Add a company to get started.') : `
+  <div class="card-list">
+    ${upcoming.map(u=>`
+      <div class="item-card">
+        <div class="left">
+          <div class="item-name">${escapeHtml(u.name)}</div>
+          <div class="item-meta"><span>${u.type} · ${fmtDate(u.date)}</span></div>
+        </div>
+        <span class="stamp-tag ${u.status==='daily'?'pending':'positive'}">${u.status==='daily'?'To Contact':'Follow-up'}</span>
+      </div>`).join('')}
+  </div>`}
+  `;
+}
+
+function tnpItemCard(x){
+  const dateField = x.status==='daily' ? x.nextContactDate : x.followUpDate;
+  const overdue = isOverdue(dateField);
+  return `
+  <div class="item-card">
+    <div class="left">
+      <div class="item-name">${escapeHtml(x.name)}</div>
+      <div class="item-meta">
+        <span>👤 ${escapeHtml(x.hrName||'—')}</span>
+        <span>📞 ${escapeHtml(x.contact||'—')}</span>
+      </div>
+    </div>
+    <span class="stamp-tag ${overdue?'overdue':(x.status==='daily'?'pending':'positive')}">${overdue?'Overdue':fmtDate(dateField)}</span>
+  </div>`;
+}
+
+function renderTnpList(view){
+  let list = state.companies;
+  let title = 'All Companies';
+  if(view==='daily'){ list = list.filter(x=>x.status==='daily'); title='Daily — Contact Next'; }
+  if(view==='positive'){ list = list.filter(x=>x.status==='positive'); title='Positive Responses'; }
+  if(view==='negative'){ list = list.filter(x=>x.status==='negative'); title='Negative Responses'; }
+
+  if(state.search){
+    const s = state.search.toLowerCase();
+    list = list.filter(x=> (x.name||'').toLowerCase().includes(s) || (x.hrName||'').toLowerCase().includes(s));
+  }
+  // sort
+  if(view==='daily') list = [...list].sort((a,b)=>(a.nextContactDate||'9999').localeCompare(b.nextContactDate||'9999'));
+  if(view==='positive') list = [...list].sort((a,b)=>(a.followUpDate||'9999').localeCompare(b.followUpDate||'9999'));
+
+  return `
+  <div class="main-header">
+    <div><h1>${title}</h1><div class="sub">${list.length} ${list.length===1?'company':'companies'}</div></div>
+    <button class="add-btn" data-modal="add-company" data-preset-status="${view==='all'?'daily':view}">+ Add Company</button>
+  </div>
+  <div class="toolbar">
+    <input class="search-box" id="search-input" placeholder="Search by company or HR name…" value="${escapeHtml(state.search)}">
+  </div>
+  ${list.length===0 ? emptyState('📁', view==='all' ? 'No companies yet. Add your first one.' : `Nothing in ${title} right now.`) : `
+  <div class="card-list">
+    ${list.map(x=>renderCompanyRow(x, view)).join('')}
+  </div>`}
+  `;
+}
+
+function renderCompanyRow(x, view){
+  const dateField = x.status==='daily' ? x.nextContactDate : (x.status==='positive' ? x.followUpDate : null);
+  const overdue = isOverdue(dateField);
+  return `
+  <div class="item-card">
+    <div class="left">
+      <div class="item-name">${escapeHtml(x.name)}
+        <span class="stamp-tag ${x.status==='positive'?'positive':x.status==='negative'?'negative':'pending'}" style="margin-left:8px;vertical-align:middle;">${x.status}</span>
+      </div>
+      <div class="item-meta">
+        <span>👤 ${escapeHtml(x.hrName||'—')}</span>
+        <span>📞 ${escapeHtml(x.contact||'—')}</span>
+        <span>✉ ${escapeHtml(x.email||'—')}</span>
+      </div>
+      ${x.status==='daily' && x.nextContactDate ? `<div class="item-meta"><span>${overdue?'⚠ Overdue since':'📅 Contact on'} ${fmtDate(x.nextContactDate)}</span></div>` : ''}
+      ${x.status==='positive' && x.followUpDate ? `<div class="item-meta"><span>${overdue?'⚠ Follow-up overdue since':'📅 Follow-up on'} ${fmtDate(x.followUpDate)}</span></div>` : ''}
+      ${x.status==='negative' && x.negativeReason ? `<div class="item-meta"><span>💬 ${escapeHtml(x.negativeReason)}</span></div>` : ''}
+    </div>
+    <div class="item-actions">
+      ${x.status!=='positive' ? `<button class="pill-btn positive" data-move="positive" data-id="${x.id}">Mark Positive</button>` : ''}
+      ${x.status!=='negative' ? `<button class="pill-btn negative" data-move="negative" data-id="${x.id}">Mark Negative</button>` : ''}
+      ${x.status!=='daily' ? `<button class="pill-btn" data-move="daily" data-id="${x.id}">Back to Daily</button>` : ''}
+      <button class="icon-btn" data-edit-company="${x.id}" title="Edit">✏️</button>
+      <button class="icon-btn" data-delete-company="${x.id}" title="Delete">🗑️</button>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   PERSONAL MAIN
+========================================================= */
+function renderPersonalMain(){
+  const v = state.personalView;
+  if(v==='dashboard') return renderPersonalDashboard();
+  if(v==='applications') return renderPersonalApplications();
+  if(v==='upcoming') return renderPersonalUpcoming();
+  return '';
+}
+
+function renderPersonalDashboard(){
+  const a = state.applications;
+  const byStatus = s => a.filter(x=>x.status===s).length;
+  const deadlineSoon = a.filter(x=>{
+    if(!x.lastRegDate || x.registeredDate) return false;
+    const days = (new Date(x.lastRegDate) - new Date(todayISO())) / 86400000;
+    return days >= 0 && days <= 3;
+  });
+  const allDates = [];
+  a.forEach(app=>{
+    (app.importantDates||[]).forEach(d=>{
+      if(d.date >= todayISO()) allDates.push({app: app.companyName, ...d});
+    });
+  });
+  allDates.sort((x,y)=>x.date.localeCompare(y.date));
+
+  return `
+  <div class="main-header">
+    <div><h1>Dashboard</h1><div class="sub">Your application pipeline at a glance</div></div>
+    <button class="add-btn" data-modal="add-application">+ Add Application</button>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card"><div class="num">${a.length}</div><div class="label">Total Applications</div></div>
+    <div class="stat-card gold"><div class="num">${byStatus('applied')}</div><div class="label">Applied</div></div>
+    <div class="stat-card"><div class="num">${byStatus('interview')}</div><div class="label">Interview Stage</div></div>
+    <div class="stat-card green"><div class="num">${byStatus('selected')}</div><div class="label">Selected</div></div>
+  </div>
+  ${deadlineSoon.length>0 ? `
+  <div class="section-title">⚠ Registration Deadlines Approaching</div>
+  <div class="card-list" style="margin-bottom:26px;">
+    ${deadlineSoon.map(x=>`
+      <div class="item-card">
+        <div class="left"><div class="item-name">${escapeHtml(x.companyName)}</div>
+        <div class="item-meta"><span>Register by ${fmtDate(x.lastRegDate)}</span></div></div>
+        <span class="stamp-tag overdue">Deadline Soon</span>
+      </div>`).join('')}
+  </div>` : ''}
+  <div class="section-title">Upcoming Dates</div>
+  ${allDates.length===0 ? emptyState('🗓️','No upcoming test or interview dates yet.') : `
+  <div class="card-list">
+    ${allDates.slice(0,6).map(d=>`
+      <div class="item-card">
+        <div class="left"><div class="item-name">${escapeHtml(d.app)}</div>
+        <div class="item-meta"><span>${escapeHtml(d.event)}${d.time?' · '+escapeHtml(d.time):''}</span></div></div>
+        <span class="stamp-tag pending">${fmtDate(d.date)}</span>
+      </div>`).join('')}
+  </div>`}
+  `;
+}
+
+function renderPersonalApplications(){
+  let list = state.applications;
+  if(state.search){
+    const s = state.search.toLowerCase();
+    list = list.filter(x=>(x.companyName||'').toLowerCase().includes(s));
+  }
+  list = [...list].sort((a,b)=>(a.lastRegDate||'9999').localeCompare(b.lastRegDate||'9999'));
+  return `
+  <div class="main-header">
+    <div><h1>Applications</h1><div class="sub">${list.length} ${list.length===1?'application':'applications'}</div></div>
+    <button class="add-btn" data-modal="add-application">+ Add Application</button>
+  </div>
+  <div class="toolbar">
+    <input class="search-box" id="search-input" placeholder="Search by company name…" value="${escapeHtml(state.search)}">
+  </div>
+  ${list.length===0 ? emptyState('📄','No applications yet. Add the first company on your list.') : `
+  <div class="card-list">${list.map(renderApplicationRow).join('')}</div>`}
+  `;
+}
+
+const STATUS_LABELS = {applied:'Applied', test:'Test Scheduled', interview:'Interview', selected:'Selected', rejected:'Rejected', hold:'On Hold'};
+
+function renderApplicationRow(x){
+  const overdue = x.lastRegDate && !x.registeredDate && isOverdue(x.lastRegDate);
+  const nextDate = (x.importantDates||[]).filter(d=>d.date>=todayISO()).sort((a,b)=>a.date.localeCompare(b.date))[0];
+  return `
+  <div class="item-card">
+    <div class="left">
+      <div class="item-name">${escapeHtml(x.companyName)}
+        <span class="stamp-tag ${x.status==='selected'?'positive':x.status==='rejected'?'negative':'pending'}" style="margin-left:8px;vertical-align:middle;">${STATUS_LABELS[x.status]||x.status}</span>
+      </div>
+      <div class="item-meta">
+        ${x.siteLink?`<span>🔗 <a href="${escapeAttr(x.siteLink)}" target="_blank" rel="noopener" style="color:var(--ink-soft);">Job link</a></span>`:''}
+        <span>✉ ${escapeHtml(x.email||'—')}</span>
+        <span>📞 ${escapeHtml(x.contact||'—')}</span>
+      </div>
+      ${x.jdSummary ? `<div class="item-meta"><span>📝 ${escapeHtml(x.jdSummary)}</span></div>` : ''}
+      ${!x.registeredDate && x.lastRegDate ? `<div class="item-meta"><span>${overdue?'⚠ Registration closed':'⏳ Register by'} ${fmtDate(x.lastRegDate)}</span></div>` : ''}
+      ${x.registeredDate ? `<div class="item-meta"><span>✅ Registered on ${fmtDate(x.registeredDate)}</span></div>` : ''}
+      ${nextDate ? `<div class="item-meta"><span>🗓️ Next: ${escapeHtml(nextDate.event)} — ${fmtDate(nextDate.date)}</span></div>` : ''}
+    </div>
+    <div class="item-actions">
+      ${!x.registeredDate ? `<button class="pill-btn positive" data-mark-registered="${x.id}">Mark Registered</button>` : ''}
+      <button class="icon-btn" data-edit-application="${x.id}" title="Edit">✏️</button>
+      <button class="icon-btn" data-delete-application="${x.id}" title="Delete">🗑️</button>
+    </div>
+  </div>`;
+}
+
+function renderPersonalUpcoming(){
+  const all = [];
+  state.applications.forEach(app=>{
+    (app.importantDates||[]).forEach(d=>{
+      all.push({appId: app.id, app: app.companyName, ...d});
+    });
+    if(!app.registeredDate && app.lastRegDate){
+      all.push({appId: app.id, app: app.companyName, event:'Registration deadline', date: app.lastRegDate, time:''});
+    }
+  });
+  all.sort((a,b)=>a.date.localeCompare(b.date));
+  const past = all.filter(x=>x.date < todayISO());
+  const future = all.filter(x=>x.date >= todayISO());
+  return `
+  <div class="main-header"><div><h1>Upcoming Dates</h1><div class="sub">Every test, interview and deadline in one line</div></div></div>
+  <div class="section-title">Upcoming (${future.length})</div>
+  ${future.length===0 ? emptyState('🗓️','Nothing scheduled ahead.') : `
+  <div class="card-list" style="margin-bottom:26px;">
+    ${future.map(d=>`
+      <div class="item-card">
+        <div class="left"><div class="item-name">${escapeHtml(d.app)}</div>
+        <div class="item-meta"><span>${escapeHtml(d.event)}${d.time?' · '+escapeHtml(d.time):''}${d.notes?' · '+escapeHtml(d.notes):''}</span></div></div>
+        <span class="stamp-tag ${isToday(d.date)?'overdue':'pending'}">${isToday(d.date)?'Today':fmtDate(d.date)}</span>
+      </div>`).join('')}
+  </div>`}
+  ${past.length>0 ? `
+  <div class="section-title">Past (${past.length})</div>
+  <div class="card-list">
+    ${past.slice(-6).reverse().map(d=>`
+      <div class="item-card" style="opacity:0.6;">
+        <div class="left"><div class="item-name">${escapeHtml(d.app)}</div>
+        <div class="item-meta"><span>${escapeHtml(d.event)}</span></div></div>
+        <span class="stamp-tag">${fmtDate(d.date)}</span>
+      </div>`).join('')}
+  </div>` : ''}
+  `;
+}
+
+/* =========================================================
+   HELPERS
+========================================================= */
+function emptyState(glyph, text){
+  return `<div class="empty-state"><div class="glyph">${glyph}</div><p>${text}</p></div>`;
+}
+function escapeHtml(s){
+  if(s===undefined||s===null) return '';
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+/* =========================================================
+   MODALS
+========================================================= */
+function renderModal(){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'modal-overlay';
+  const m = state.modal;
+  let inner = '';
+  if(m.type === 'add-company') inner = companyModalHtml(m.data);
+  if(m.type === 'add-application') inner = applicationModalHtml(m.data);
+  if(m.type === 'move-status') inner = moveStatusModalHtml(m.data);
+  if(m.type === 'company-detail') inner = companyDetailModalHtml(m.data);
+  overlay.innerHTML = inner;
+  document.getElementById('app').appendChild(overlay);
+}
+
+function companyModalHtml(data){
+  const editing = !!(data && data.id);
+  const d = data || {};
+  return `
+  <div class="modal">
+    <div class="modal-head"><h3>${editing?'Edit Company':'Add Company'}</h3><button class="modal-close" id="close-modal">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Company Name</label><input id="f-name" value="${escapeAttr(d.name||'')}" placeholder="e.g. Acme Technologies"></div>
+      <div class="form-grid">
+        <div class="form-row"><label>HR Name</label><input id="f-hrname" value="${escapeAttr(d.hrName||'')}"></div>
+        <div class="form-row"><label>Contact No.</label><input id="f-contact" value="${escapeAttr(d.contact||'')}"></div>
+      </div>
+      <div class="form-row"><label>Email</label><input id="f-email" value="${escapeAttr(d.email||'')}"></div>
+      <div class="form-row"><label>Status</label>
+        <select id="f-status">
+          <option value="daily" ${d.status==='daily'||!d.status?'selected':''}>Daily (to contact)</option>
+          <option value="positive" ${d.status==='positive'?'selected':''}>Positive</option>
+          <option value="negative" ${d.status==='negative'?'selected':''}>Negative</option>
+        </select>
+      </div>
+      <div class="form-row" id="wrap-nextcontact" style="${d.status==='positive'||d.status==='negative'?'display:none':''}">
+        <label>Next Contact Date</label><input type="date" id="f-nextcontact" value="${d.nextContactDate||todayISO()}">
+      </div>
+      <div class="form-row" id="wrap-followup" style="${d.status!=='positive'?'display:none':''}">
+        <label>Follow-up Reminder Date</label><input type="date" id="f-followup" value="${d.followUpDate||nextMonthDefault()}">
+      </div>
+      <div class="form-row" id="wrap-reason" style="${d.status!=='negative'?'display:none':''}">
+        <label>Reason (optional)</label><textarea id="f-reason" placeholder="e.g. Not hiring freshers this cycle">${escapeHtml(d.negativeReason||'')}</textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" id="close-modal">Cancel</button>
+      <button class="btn-solid" id="save-company" data-id="${d.id||''}">Save</button>
+    </div>
+  </div>`;
+}
+
+function applicationModalHtml(data){
+  const editing = !!(data && data.id);
+  const d = data || {};
+  return `
+  <div class="modal">
+    <div class="modal-head"><h3>${editing?'Edit Application':'Add Application'}</h3><button class="modal-close" id="close-modal">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Company Name</label><input id="f-companyname" value="${escapeAttr(d.companyName||'')}"></div>
+      <div class="form-row"><label>Application / Site Link</label><input id="f-sitelink" value="${escapeAttr(d.siteLink||'')}" placeholder="https://"></div>
+      <div class="form-grid">
+        <div class="form-row"><label>Contact No.</label><input id="f-contact" value="${escapeAttr(d.contact||'')}"></div>
+        <div class="form-row"><label>Email</label><input id="f-email" value="${escapeAttr(d.email||'')}"></div>
+      </div>
+      <div class="form-row"><label>Job Description Summary</label><textarea id="f-jdsummary" placeholder="Role, key requirements, package…">${escapeHtml(d.jdSummary||'')}</textarea></div>
+      <div class="form-grid">
+        <div class="form-row"><label>Last Date to Register</label><input type="date" id="f-lastreg" value="${d.lastRegDate||''}"></div>
+        <div class="form-row"><label>Registered On (if done)</label><input type="date" id="f-regdate" value="${d.registeredDate||''}"></div>
+      </div>
+      <div class="form-row"><label>Status</label>
+        <select id="f-appstatus">
+          ${Object.entries(STATUS_LABELS).map(([k,v])=>`<option value="${k}" ${d.status===k?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" id="close-modal">Cancel</button>
+      <button class="btn-solid" id="save-application" data-id="${d.id||''}">Save</button>
+    </div>
+  </div>`;
+}
+
+function moveStatusModalHtml(data){
+  const {id, target} = data;
+  const company = state.companies.find(c=>c.id===id);
+  if(target === 'positive'){
+    return `
+    <div class="modal">
+      <div class="modal-head"><h3>Mark as Positive</h3><button class="modal-close" id="close-modal">✕</button></div>
+      <div class="modal-body">
+        <p style="font-size:13.5px;color:var(--ink-soft);margin-top:0;">${escapeHtml(company.name)} responded positively. Set a follow-up reminder.</p>
+        <div class="form-row"><label>Follow-up Date</label><input type="date" id="f-followup-date" value="${nextMonthDefault()}"></div>
+        <div class="form-row"><label>Note (optional)</label><textarea id="f-move-note" placeholder="e.g. Said they'll open hiring in September"></textarea></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-ghost" id="close-modal">Cancel</button>
+        <button class="btn-solid green" id="confirm-move" data-id="${id}" data-target="positive">Confirm</button>
+      </div>
+    </div>`;
+  }
+  if(target === 'negative'){
+    return `
+    <div class="modal">
+      <div class="modal-head"><h3>Mark as Negative</h3><button class="modal-close" id="close-modal">✕</button></div>
+      <div class="modal-body">
+        <p style="font-size:13.5px;color:var(--ink-soft);margin-top:0;">${escapeHtml(company.name)} — add the reason given.</p>
+        <div class="form-row"><label>Reason</label><textarea id="f-move-note" placeholder="e.g. Not hiring freshers right now"></textarea></div>
+        <div class="form-row"><label>Re-attempt later? (optional)</label><input type="date" id="f-reattempt-date"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-ghost" id="close-modal">Cancel</button>
+        <button class="btn-solid rust" id="confirm-move" data-id="${id}" data-target="negative">Confirm</button>
+      </div>
+    </div>`;
+  }
+  // back to daily
+  return `
+  <div class="modal">
+    <div class="modal-head"><h3>Move to Daily</h3><button class="modal-close" id="close-modal">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row"><label>Next Contact Date</label><input type="date" id="f-nextcontact-date" value="${todayISO()}"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" id="close-modal">Cancel</button>
+      <button class="btn-solid" id="confirm-move" data-id="${id}" data-target="daily">Confirm</button>
+    </div>
+  </div>`;
+}
+
+/* =========================================================
+   EVENT HANDLERS
+========================================================= */
+function attachHandlers(){
+  // landing
+  document.querySelectorAll('[data-open-module]').forEach(el=>{
+    el.addEventListener('click', ()=>goToAuth(el.getAttribute('data-open-module')));
+  });
+  // auth
+  if(state.screen==='auth'){
+    initAuthScreen();
+    const submit = document.getElementById('pin-submit');
+    const field = document.getElementById('pin-field');
+    if(submit) submit.addEventListener('click', handlePinSubmit);
+    if(field) field.addEventListener('keydown', e=>{ if(e.key==='Enter') handlePinSubmit(); });
+    const back = document.getElementById('back-to-landing');
+    if(back) back.addEventListener('click', e=>{ e.preventDefault(); state.screen='landing'; render(); });
+  }
+  // sidebar nav
+  document.querySelectorAll('[data-nav]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const v = el.getAttribute('data-nav');
+      if(state.screen==='tnp') state.tnpView = v; else state.personalView = v;
+      state.search='';
+      render();
+    });
+  });
+  const lockBtn = document.getElementById('lock-desk');
+  if(lockBtn) lockBtn.addEventListener('click', ()=>{ state.screen='landing'; state.module=null; render(); });
+
+  // search
+  const searchInput = document.getElementById('search-input');
+  if(searchInput){
+    searchInput.addEventListener('input', e=>{ state.search = e.target.value; renderInPlace(); });
+  }
+
+  // add buttons
+  document.querySelectorAll('[data-modal]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const type = el.getAttribute('data-modal');
+      const preset = el.getAttribute('data-preset-status');
+      state.modal = {type, data: preset ? {status:preset} : null};
+      render();
+    });
+  });
+
+  // company move pills
+  document.querySelectorAll('[data-move]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      state.modal = {type:'move-status', data:{id: el.getAttribute('data-id'), target: el.getAttribute('data-move')}};
+      render();
+    });
+  });
+  document.querySelectorAll('[data-edit-company]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const c = state.companies.find(x=>x.id===el.getAttribute('data-edit-company'));
+      state.modal = {type:'add-company', data:c};
+      render();
+    });
+  });
+  document.querySelectorAll('[data-delete-company]').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      if(!confirm('Delete this company record?')) return;
+      const id = el.getAttribute('data-delete-company');
+      const ok = await deleteCompanyRemote(id);
+      if(ok){
+        state.companies = state.companies.filter(x=>x.id!==id);
+        toast('Company deleted');
+      }
+      render();
+    });
+  });
+
+  // application handlers
+  document.querySelectorAll('[data-edit-application]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const a = state.applications.find(x=>x.id===el.getAttribute('data-edit-application'));
+      state.modal = {type:'add-application', data:a};
+      render();
+    });
+  });
+  document.querySelectorAll('[data-delete-application]').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      if(!confirm('Delete this application?')) return;
+      const id = el.getAttribute('data-delete-application');
+      const ok = await deleteApplicationRemote(id);
+      if(ok){
+        state.applications = state.applications.filter(x=>x.id!==id);
+        toast('Application deleted');
+      }
+      render();
+    });
+  });
+  document.querySelectorAll('[data-mark-registered]').forEach(el=>{
+    el.addEventListener('click', async ()=>{
+      const a = state.applications.find(x=>x.id===el.getAttribute('data-mark-registered'));
+      const prev = a.registeredDate;
+      a.registeredDate = todayISO();
+      const ok = await saveApplicationRemote(a);
+      if(ok){ toast('Marked as registered'); } else { a.registeredDate = prev; }
+      render();
+    });
+  });
+
+  // modal close
+  document.querySelectorAll('#close-modal').forEach(el=>{
+    el.addEventListener('click', ()=>{ state.modal=null; render(); });
+  });
+  const overlay = document.getElementById('modal-overlay');
+  if(overlay) overlay.addEventListener('click', e=>{ if(e.target.id==='modal-overlay'){ state.modal=null; render(); } });
+
+  // status select toggles fields (add-company modal)
+  const statusSel = document.getElementById('f-status');
+  if(statusSel){
+    statusSel.addEventListener('change', ()=>{
+      const v = statusSel.value;
+      document.getElementById('wrap-nextcontact').style.display = v==='daily' ? '' : 'none';
+      document.getElementById('wrap-followup').style.display = v==='positive' ? '' : 'none';
+      document.getElementById('wrap-reason').style.display = v==='negative' ? '' : 'none';
+    });
+  }
+
+  // save company
+  const saveCompanyBtn = document.getElementById('save-company');
+  if(saveCompanyBtn) saveCompanyBtn.addEventListener('click', saveCompany);
+
+  // save application
+  const saveAppBtn = document.getElementById('save-application');
+  if(saveAppBtn) saveAppBtn.addEventListener('click', saveApplication);
+
+  // confirm move
+  const confirmMoveBtn = document.getElementById('confirm-move');
+  if(confirmMoveBtn) confirmMoveBtn.addEventListener('click', confirmMove);
+}
+
+function renderInPlace(){
+  // lightweight re-render for search typing, preserves focus by re-rendering full shell (simple approach)
+  const activeEl = document.activeElement;
+  const cursorPos = activeEl && activeEl.id==='search-input' ? activeEl.selectionStart : null;
+  render();
+  if(cursorPos!==null){
+    const el = document.getElementById('search-input');
+    if(el){ el.focus(); el.setSelectionRange(cursorPos,cursorPos); }
+  }
+}
+
+async function saveCompany(){
+  const name = document.getElementById('f-name').value.trim();
+  if(!name){ toast('Company name is required'); return; }
+  const id = document.getElementById('save-company').getAttribute('data-id');
+  const status = document.getElementById('f-status').value;
+  const payload = {
+    id: id || uid(),
+    name,
+    hrName: document.getElementById('f-hrname').value.trim(),
+    contact: document.getElementById('f-contact').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    status,
+    nextContactDate: document.getElementById('f-nextcontact') ? document.getElementById('f-nextcontact').value : null,
+    followUpDate: document.getElementById('f-followup') ? document.getElementById('f-followup').value : null,
+    negativeReason: document.getElementById('f-reason') ? document.getElementById('f-reason').value.trim() : '',
+    history: [],
+    createdAt: todayISO()
+  };
+  if(id){
+    const idx = state.companies.findIndex(x=>x.id===id);
+    payload.history = state.companies[idx].history || [];
+    payload.createdAt = state.companies[idx].createdAt;
+  }
+  const ok = await saveCompanyRemote(payload);
+  if(!ok){ return; }
+  if(id){
+    const idx = state.companies.findIndex(x=>x.id===id);
+    state.companies[idx] = payload;
+  } else {
+    state.companies.push(payload);
+  }
+  state.modal = null;
+  toast('Company saved');
+  render();
+}
+
+async function saveApplication(){
+  const companyName = document.getElementById('f-companyname').value.trim();
+  if(!companyName){ toast('Company name is required'); return; }
+  const id = document.getElementById('save-application').getAttribute('data-id');
+  const payload = {
+    id: id || uid(),
+    companyName,
+    siteLink: document.getElementById('f-sitelink').value.trim(),
+    contact: document.getElementById('f-contact').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    jdSummary: document.getElementById('f-jdsummary').value.trim(),
+    lastRegDate: document.getElementById('f-lastreg').value,
+    registeredDate: document.getElementById('f-regdate').value,
+    status: document.getElementById('f-appstatus').value,
+    importantDates: [],
+    createdAt: todayISO()
+  };
+  if(id){
+    const idx = state.applications.findIndex(x=>x.id===id);
+    payload.importantDates = state.applications[idx].importantDates || [];
+    payload.createdAt = state.applications[idx].createdAt;
+  }
+  const ok = await saveApplicationRemote(payload);
+  if(!ok){ return; }
+  if(id){
+    const idx = state.applications.findIndex(x=>x.id===id);
+    state.applications[idx] = payload;
+  } else {
+    state.applications.push(payload);
+  }
+  state.modal = null;
+  toast('Application saved');
+  render();
+}
+
+async function confirmMove(){
+  const btn = document.getElementById('confirm-move');
+  const id = btn.getAttribute('data-id');
+  const target = btn.getAttribute('data-target');
+  const c = state.companies.find(x=>x.id===id);
+  const note = document.getElementById('f-move-note') ? document.getElementById('f-move-note').value.trim() : '';
+  c.status = target;
+  if(target==='positive'){
+    c.followUpDate = document.getElementById('f-followup-date').value;
+    c.negativeReason = '';
+  } else if(target==='negative'){
+    c.negativeReason = note;
+    c.reattemptDate = document.getElementById('f-reattempt-date').value || null;
+  } else if(target==='daily'){
+    c.nextContactDate = document.getElementById('f-nextcontact-date').value;
+  }
+  const prevHistory = c.history || [];
+  c.history = [...prevHistory, {date: todayISO(), outcome: target, note}];
+  const ok = await saveCompanyRemote(c);
+  if(!ok){ c.history = prevHistory; return; }
+  state.modal = null;
+  toast(`Moved to ${target}`);
+  render();
+}
+
+/* =========================================================
+   INIT
+========================================================= */
+render();
+</script>
+</body>
+</html>
