@@ -276,6 +276,7 @@ function companyToRow(c){
     email: c.email || null, status: c.status || 'daily',
     next_contact_date: c.nextContactDate || null, follow_up_date: c.followUpDate || null,
     negative_reason: c.negativeReason || null, reattempt_date: c.reattemptDate || null,
+    remarks: c.remarks || null,
     history: c.history || [], created_at: c.createdAt || todayISO()
   };
 }
@@ -284,6 +285,7 @@ function rowToCompany(r){
     id: r.id, name: r.name, hrName: r.hr_name, contact: r.contact, email: r.email,
     status: r.status, nextContactDate: r.next_contact_date, followUpDate: r.follow_up_date,
     negativeReason: r.negative_reason, reattemptDate: r.reattempt_date,
+    remarks: r.remarks,
     history: r.history || [], createdAt: r.created_at
   };
 }
@@ -711,6 +713,7 @@ function renderCompanyRow(x, view){
       ${x.status==='daily' && x.nextContactDate ? `<div class="item-meta"><span>${overdue?'⚠ Overdue since':'📅 Contact on'} ${fmtDate(x.nextContactDate)}</span></div>` : ''}
       ${x.status==='positive' && x.followUpDate ? `<div class="item-meta"><span>${overdue?'⚠ Follow-up overdue since':'📅 Follow-up on'} ${fmtDate(x.followUpDate)}</span></div>` : ''}
       ${x.status==='negative' && x.negativeReason ? `<div class="item-meta"><span>💬 ${escapeHtml(x.negativeReason)}</span></div>` : ''}
+      ${x.remarks ? `<div class="item-meta"><span>📝 ${escapeHtml(x.remarks)}</span></div>` : ''}
     </div>
     <div class="item-actions">
       ${x.status!=='positive' ? `<button class="pill-btn positive" data-move="positive" data-id="${x.id}">Mark Positive</button>` : ''}
@@ -927,6 +930,9 @@ function companyModalHtml(data){
       </div>
       <div class="form-row" id="wrap-reason" style="${d.status!=='negative'?'display:none':''}">
         <label>Reason (optional)</label><textarea id="f-reason" placeholder="e.g. Not hiring freshers this cycle">${escapeHtml(d.negativeReason||'')}</textarea>
+      </div>
+      <div class="form-row">
+        <label>Remarks (optional)</label><textarea id="f-remarks" placeholder="Any general notes about this company — package, referral, prior interactions…">${escapeHtml(d.remarks||'')}</textarea>
       </div>
     </div>
     <div class="modal-foot">
@@ -1175,6 +1181,7 @@ async function saveCompany(){
     nextContactDate: document.getElementById('f-nextcontact') ? document.getElementById('f-nextcontact').value : null,
     followUpDate: document.getElementById('f-followup') ? document.getElementById('f-followup').value : null,
     negativeReason: document.getElementById('f-reason') ? document.getElementById('f-reason').value.trim() : '',
+    remarks: document.getElementById('f-remarks') ? document.getElementById('f-remarks').value.trim() : '',
     history: [],
     createdAt: todayISO()
   };
